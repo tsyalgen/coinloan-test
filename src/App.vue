@@ -1,8 +1,9 @@
-<template>
-  <div>
-    <p>{{ rates }}</p>
-    <p>{{ pairs }}</p>
-  </div>
+<template  lang="pug">
+  div
+    .pug
+      p {{ pairs }}
+    .pug__huyag
+      p {{ rates }}
 </template>
 
 <script>
@@ -35,5 +36,11 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+  .pug {
+    color:red;
+    &__huyag {
+      color:blue;
+    }
+  }
 </style>
