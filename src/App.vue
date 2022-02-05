@@ -1,28 +1,39 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <p>{{ rates }}</p>
+    <p>{{ pairs }}</p>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import {fetchPairs, fetchRates} from '@/services/fetchers'
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      message: '',
+      pairs: '',
+      rates: ''
+    }
+  },
+  methods: {
+    async getData() {
+      try {
+        this.pairs = await fetchPairs()
+        this.rates = await fetchRates()
+      }
+      catch(error){
+        this.pairs = 'Pairs error!'
+        this.rates = 'Rates error!'
+      }
+    }
+  },
+  async created() {
+    await this.getData()
+    setInterval(this.getData, 30000)
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
