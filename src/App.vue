@@ -1,31 +1,34 @@
 <template  lang="pug">
-  div
-    .pug
-      p {{ pairs }}
-    .pug__huyag
-      p {{ rates }}
+  div.container
+    h2.container__warn(v-if="isError") API error
+    converter(v-else :pairs="pairs" :rates="rates")
 </template>
 
 <script>
 import {fetchPairs, fetchRates} from '@/services/fetchers'
+import Converter from "@/components/Converter";
 
 export default {
+  name: 'App',
+  components: {
+    Converter
+  },
   data() {
     return {
-      message: '',
-      pairs: '',
-      rates: ''
+      isError: false,
+      pairs: [],
+      rates: []
     }
   },
   methods: {
     async getData() {
+      this.isError = false
       try {
         this.pairs = await fetchPairs()
         this.rates = await fetchRates()
       }
-      catch(error){
-        this.pairs = 'Pairs error!'
-        this.rates = 'Rates error!'
+      catch(error) {
+        this.isError = true
       }
     }
   },
@@ -36,11 +39,14 @@ export default {
 }
 </script>
 
-<style lang="scss">
-  .pug {
-    color:red;
-    &__huyag {
-      color:blue;
-    }
+<style lang="scss" scoped>
+.container {
+  margin: 60px auto;
+  width: 50%;
+  &__warn {
+    color: darkred;
+    text-align: center;
   }
+}
+
 </style>
