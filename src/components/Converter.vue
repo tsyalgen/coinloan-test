@@ -1,6 +1,6 @@
 <template lang="pug">
   form.converter
-    h3.converter__title Exchange {{ selectPayItem }} to {{ selectGetItem }}
+    h3.converter__title Exchange {{ selectedPayItem }} to {{ selectedGetItem }}
     input-element(
       :type="'payInput'"
       :currencies="currencyList"
@@ -15,7 +15,7 @@
       @updateCurrency="onUpdateGetCurrency"
       @updateInput="onUpdateGetInput"
     )
-    button.converter__submit(type="submit") Exchange
+    button.converter__submit(type="submit" @click.prevent="$emit('popup')") Exchange
 </template>
 
 <script>
@@ -40,8 +40,8 @@ export default {
   data() {
     return {
       currencyList: currencyList,
-      selectPayItem: null,
-      selectGetItem: null,
+      selectedPayItem: null,
+      selectedGetItem: null,
       inputPayValue: null,
       inputGetValue: null,
       isReverse: null
@@ -50,16 +50,16 @@ export default {
   computed: {
     inputCurrencies() {
       return this.currencyList.filter((item)=> {
-        return item !== this.selectPayItem
+        return item !== this.selectedPayItem
       })
     },
     currentPair() {
-      return `${this.selectPayItem}/${this.selectGetItem}`
+      return `${this.selectedPayItem}/${this.selectedGetItem}`
     },
     commissifeon() {
       return this.pairs.filter(obj => {
-        return (obj.base_currency === this.selectGetItem && obj.quote_currency === this.selectPayItem) ||
-            (obj.quote_currency === this.selectGetItem && obj.base_currency === this.selectPayItem)
+        return (obj.base_currency === this.selectedGetItem && obj.quote_currency === this.selectedPayItem) ||
+            (obj.quote_currency === this.selectedGetItem && obj.base_currency === this.selectedPayItem)
       })[0].commissifeon
     },
     rate() {
@@ -82,14 +82,17 @@ export default {
   },
   methods: {
     onUpdatePayCurrency(item) {
-      this.selectPayItem = item
+      if (this.selectedGetItem === item) {
+        this.selectedGetItem = currencyList[0]
+      }
+      this.selectedPayItem = item
       setTimeout(() => {
         this.convertGetInPay()
       }, 100)
 
     },
     onUpdateGetCurrency(item) {
-      this.selectGetItem = item
+      this.selectedGetItem = item
       setTimeout(() => {
         this.convertGetInPay()
       }, 50)

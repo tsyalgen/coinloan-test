@@ -1,21 +1,25 @@
 <template  lang="pug">
   div.container
     h2.container__warn(v-if="isError") API error
-    converter(v-else :pairs="pairs" :rates="rates")
+    converter(v-else :pairs="pairs" :rates="rates" @popup="isModal = true")
+    popup(v-if="isModal" @close="isModal = false")
 </template>
 
 <script>
 import {fetchPairs, fetchRates} from '@/services/fetchers'
 import Converter from "@/components/Converter";
+import Popup from "@/components/Popup";
 
 export default {
   name: 'App',
   components: {
+    Popup,
     Converter
   },
   data() {
     return {
       isError: false,
+      isModal: false,
       pairs: [],
       rates: []
     }
@@ -48,5 +52,4 @@ export default {
     text-align: center;
   }
 }
-
 </style>
