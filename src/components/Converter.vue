@@ -1,13 +1,26 @@
 <template lang="pug">
   form.converter
-    h3.converter__title Exchange NAME1 to NAME2
-    input-element(:type="'payInput'")
-    input-element(:type="'getInput'")
+    h3.converter__title Exchange {{ selectPayItem }} to {{ selectGetItem }}
+    input-element(
+      :type="'payInput'"
+      :currencies="currencyList"
+      :inputData="inputPayValue"
+      @updateCurrency="onUpdatePayCurrency"
+      @updateInput="onUpdatePayInput"
+    )
+    input-element(
+      :type="'getInput'"
+      :currencies="inputCurrencies"
+      :inputData="inputGetValue"
+      @updateCurrency="onUpdateGetCurrency"
+      @updateInput="onUpdateGetInput"
+    )
     button.converter__submit(type="submit") Exchange
 </template>
 
 <script>
-import InputElement from "@/components/InputElement";
+import InputElement from "@/components/InputElement"
+import {currencyList} from "@/utils/generators"
 
 export default {
   name: "Converter",
@@ -23,6 +36,91 @@ export default {
       type: Array,
       required: true,
     }
+  },
+  data() {
+    return {
+      currencyList: currencyList,
+      selectPayItem: null,
+      selectGetItem: null,
+      inputPayValue: null,
+      inputGetValue: null,
+      isReverse: null
+    }
+  },
+  computed: {
+    inputCurrencies() {
+      return this.currencyList.filter((item)=> {
+        return item !== this.selectPayItem
+      })
+    },
+    currentPair() {
+      return `${this.selectPayItem}/${this.selectGetItem}`
+    },
+    commissifeon() {
+      return this.pairs.filter(obj => {
+        return (obj.base_currency === this.selectGetItem && obj.quote_currency === this.selectPayItem) ||
+            (obj.quote_currency === this.selectGetItem && obj.base_currency === this.selectPayItem)
+      })[0].commissifeon
+    },
+    rate() {
+      return this.rates.filter((obj) => {
+        let reversePair = obj.pair.split('/').reverse().join('/')
+        if (obj.pair === this.currentPair) {
+          this.isReverse = false
+          return obj
+        } else if (this.currentPair === reversePair) {
+          this.isReverse = true
+          return obj
+        }
+      })[0].rate
+    },
+  },
+  watch: {
+    rates() {
+      this.convertGetInPay()
+    }
+  },
+  methods: {
+    onUpdatePayCurrency(item) {
+      this.selectPayItem = item
+      setTimeout(() => {
+        this.convertGetInPay()
+      }, 100)
+
+    },
+    onUpdateGetCurrency(item) {
+      this.selectGetItem = item
+      setTimeout(() => {
+        this.convertGetInPay()
+      }, 50)
+
+    },
+    onUpdatePayInput(value) {
+      this.inputPayValue = value
+      this.convertGetInPay()
+    },
+    onUpdateGetInput(value) {
+      this.inputGetValue = value
+      this.convertPayInGet()
+    },
+    convertGetInPay() {
+      if (!this.isReverse) {
+        this.inputGetValue = String(this.inputPayValue * this.rate *
+            ((100 - +this.commissifeon) / 100).toFixed(4))
+      } else {
+        this.inputGetValue = String(this.inputPayValue * +(1 / this.rate).toFixed(4) *
+            +((100 - +this.commissifeon) / 100).toFixed(4))
+      }
+    },
+    convertPayInGet() {
+      if (!this.isReverse) {
+        this.inputPayValue = String(this.inputGetValue * +( 1 / this.rate).toFixed(4) *
+            ((100 + +this.commissifeon) / 100).toFixed(4))
+      } else {
+        this.inputPayValue = String(this.inputGetValue * this.rate *
+            +((100 + +this.commissifeon) / 100).toFixed(4))
+      }
+    },
   }
 }
 </script>

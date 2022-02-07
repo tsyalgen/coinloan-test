@@ -1,4 +1,4 @@
-const currencyList = [
+ export const currencyList = [
     "EUR",
     "USD",
     "XCD",
@@ -38,8 +38,8 @@ export const generatePairs = function () {
             {
                 base_currency: el[0],
                 quote_currency: el[1],
-                commissifeon: randomCommissifeon()
-            }
+                commissifeon: randomCommissifeon() // полагается, что комиссия при обмене
+            }                                      // с одной валюты на другую и обрадно - одинаковые
         )
     })
 

@@ -1,9 +1,18 @@
 <template lang="pug">
   div.input
-    p.input__title You {{ types[type] }}
-    input.input__field(:placeholder="`${types[type]} Amount`")
-    select.input__select
-      option.input__select_item(v-for="value in object") {{ value }}
+    p.input__title You {{ inputTypes[type] }}
+    input.input__field(
+      :placeholder="`${inputTypes[type]} Amount`"
+      v-model.trim="inputValue"
+    )
+    select.input__select(
+      v-model="selectedItem"
+      @change="sendCurrency"
+    )
+      option.input__select_item(
+        v-for="(item, index) in currencies"
+        :key="index"
+      ) {{ item }}
 </template>
 <script>
 
@@ -14,34 +23,45 @@ export default {
       type: String,
       required: true
     },
+    currencies: {
+      type: Array,
+      required: true
+    },
+    inputData: {
+      type: String
+    }
   },
   data() {
     return {
-      types: {
+      inputTypes: {
         getInput: 'Get',
         payInput: 'Pay'
       },
-      object: {
-        name: 123123,
-        name2: 234234,
-        name3: 124124,
-        asdsad: "dfdfvfdv",
-        asssad: "dfdfvfdv",
-        asasdasdad: "dfdfvfdv",
-        asdasddsad: "dfdfvfdv",
-        asasdasddssad: "dfdfvfdv",
-        asasdasdasdsad: "dfdfvfdv",
-        asdsasdasdd: "dfdfvfdv",
-        asadassssad: "dfdfvfdv",
-        aasdsaddsad: "dfdfvfdv",
-        asdasdsadad: "dfdfvfdv",
-        asdasdsadd: "dfdfvfdv",
-        asasdsadasdad: "dfdfvfdv",
-        asasdsadd: "dfdfvfdv",
-        asasdasdssasdsad: "dfdfvfdv"
+      selectedItem: this.type === 'payInput' ? 'EUR' : 'USD',
+    }
+  },
+  computed: {
+    inputValue: {
+      get: function () {
+        if (typeof +this.inputData === 'number' && isFinite(+this.inputData)) {
+          return this.inputData
+        } else {
+          return null
+        }
+      },
+      set: function (value) {
+        this.$emit('updateInput', value)
       }
     }
   },
+  methods: {
+    sendCurrency() {
+      this.$emit('updateCurrency', this.selectedItem)
+    }
+  },
+  mounted() {
+    this.sendCurrency()
+  }
 }
 </script>
 <style lang="scss" scoped>
