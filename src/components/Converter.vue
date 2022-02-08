@@ -88,14 +88,14 @@ export default {
       this.selectedPayItem = item
       setTimeout(() => {
         this.convertGetInPay()
-      }, 100)
+      }, 200)
 
     },
     onUpdateGetCurrency(item) {
       this.selectedGetItem = item
       setTimeout(() => {
         this.convertGetInPay()
-      }, 50)
+      }, 200)
 
     },
     onUpdatePayInput(value) {
