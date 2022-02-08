@@ -3,14 +3,14 @@
     h3.converter__title Exchange {{ selectedPayItem }} to {{ selectedGetItem }}
     input-element(
       :type="'payInput'"
-      :currencies="currencyList"
+      :currencies="firstCurrency ? firstCurrency : currencyList"
       :inputData="inputPayValue"
       @updateCurrency="onUpdatePayCurrency"
       @updateInput="onUpdatePayInput"
     )
     input-element(
       :type="'getInput'"
-      :currencies="inputCurrencies"
+      :currencies="secondCurrency"
       :inputData="inputGetValue"
       @updateCurrency="onUpdateGetCurrency"
       @updateInput="onUpdateGetInput"
@@ -48,10 +48,18 @@ export default {
     }
   },
   computed: {
-    inputCurrencies() {
+    secondCurrency() {
       return this.currencyList.filter((item)=> {
         return item !== this.selectedPayItem
       })
+    },
+    firstCurrency() {
+      if (this.selectedGetItem) {
+        return this.currencyList.filter((item)=> {
+          return item !== this.selectedGetItem
+        })
+      }
+      return null
     },
     currentPair() {
       return `${this.selectedPayItem}/${this.selectedGetItem}`
